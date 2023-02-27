@@ -12,7 +12,7 @@ import employmentifnoSchema from "./subUserSchema/employmentifno.js";
 const userProfileSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: User,
+    ref: "User",
   },
   // basicInfo:
   basicInfo: basicInfoSchema,

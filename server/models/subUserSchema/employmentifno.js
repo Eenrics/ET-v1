@@ -28,3 +28,5 @@ const employmentifnoSchema = new mongoose.Schema({
     },
   },
 });
+
+export default employmentifnoSchema;

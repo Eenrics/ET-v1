@@ -12,3 +12,5 @@ const languagesSchema = new mongoose.Schema({
     required: true,
   },
 });
+
+export default languagesSchema;

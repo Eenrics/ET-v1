@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-
-import Role from "./Role.js";
+import UserProfile from "./UserProfile.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -64,8 +63,12 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
     role: {
+      type: Number,
+      default: 0,
+    },
+    userProfile: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: Role,
+      ref: "UserProfile",
     },
   },
   { timestamps: true }
@@ -150,7 +153,7 @@ userSchema.statics.forgotPassword = async function (email) {
   if (!user) {
     throw new Error("User not found");
   }
-  const code = crypto.randomBytes(4).toString("hex");
+  const code = crypto.randomInt(100000, 999999).toString();
   user.resetPasswordCode = code;
   user.resetPasswordCodeExpiration = Date.now() + 15 * 60 * 1000; // 15 minutes
   await user.save();
