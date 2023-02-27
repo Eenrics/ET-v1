@@ -1,1 +1,4 @@
 node_modules/
+
+# ignore config.env file
+config/config.env
