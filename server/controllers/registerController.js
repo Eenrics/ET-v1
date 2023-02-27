@@ -1,13 +1,13 @@
 import User from "../models/User.js";
 import createToken from "../utils/CreateToken.js";
 import nodemailer from "nodemailer";
+import jwt from "jsonwebtoken";
 
 const registerUser = async (req, res) => {
   const { email, password, phoneNumber } = req.body;
 
   try {
     const user = await User.register(email, password, phoneNumber);
-    const token = createToken(user._id);
 
     // send email verification
     const verificationToken = jwt.sign(
@@ -40,6 +40,12 @@ const registerUser = async (req, res) => {
       }
     });
     await user.save();
+
+    res.status(200).json({
+      success: true,
+      user: user,
+      message: "Account Created",
+    });
   } catch (error) {
     res.status(404).json({
       success: false,
