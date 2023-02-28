@@ -14,7 +14,6 @@ const loginUser = async (req, res) => {
       success: true,
       message: "Successfully logged in",
       token,
-      data: user,
     });
   } catch (error) {
     res.status(404).json({

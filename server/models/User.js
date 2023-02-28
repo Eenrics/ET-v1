@@ -81,7 +81,6 @@ userSchema.statics.register = async function (email, password, phoneNumber) {
     throw new Error("Please provide email, password and phone number");
   }
 
-  // check if user already exists
   // check if user already exists with email or phone number
   const exist = await this.findOne().or([{ email }, { phoneNumber }]);
   if (exist) {
