@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import morgan from "morgan";
-import authRouter from "./routes/auth.js";
+import authRouter from "./routes/authRoute.js";
 import userRouter from "./routes/profileRoute.js";
 import projectRouter from "./routes/projectRoute.js";
 

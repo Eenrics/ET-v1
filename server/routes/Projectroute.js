@@ -1,8 +1,8 @@
 import express from "express";
-import { createProject } from "../controllers/createprojectcontroller.js";
+import { createProject } from "../controllers/project/createprojectcontroller.js";
 import checkRole from "../middleware/checkRole.js";
 import requireAuth from "../middleware/requireAuth.js";
-import { createTask } from "../controllers/createTask.js";
+import { createTask } from "../controllers/task/createTask.js";
 
 const router = express.Router();
 

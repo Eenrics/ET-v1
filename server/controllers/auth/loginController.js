@@ -1,5 +1,5 @@
-import User from "../models/User.js";
-import createToken from "../utils/CreateToken.js";
+import User from "../../models/User.js";
+import createToken from "../../utils/CreateToken.js";
 
 const loginUser = async (req, res) => {
   const { identifier, password } = req.body;
