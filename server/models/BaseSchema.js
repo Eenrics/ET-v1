@@ -10,8 +10,7 @@ const baseSchema = new mongoose.Schema({
   description: {
     type: String,
     required: [true, "Please enter project description"],
-    min: 2,
-    max: 30,
+    min: 100,
   },
   startDate: {
     type: Date,

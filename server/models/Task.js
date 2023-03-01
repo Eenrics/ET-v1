@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import baseSchema from "./BaseSchema.js";
+import User from "./User.js";
+
 const taskSchema = new mongoose.Schema({
   ...baseSchema.obj,
   documents: [
@@ -28,3 +30,7 @@ const taskSchema = new mongoose.Schema({
     ref: "Project",
   },
 });
+
+const Task = mongoose.model("Task", taskSchema);
+
+export default Task;

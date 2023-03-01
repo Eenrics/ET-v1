@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import authRouter from "./routes/auth.js";
+import userRouter from "./routes/profileRoute.js";
+import projectRouter from "./routes/projectRoute.js";
 
 // database connnection
 import connectDatabase from "./config/database.js";
@@ -19,6 +21,8 @@ app.use(morgan("tiny"));
 
 // set up routes
 app.use("/api/v1", authRouter);
+app.use("/api/v1", userRouter);
+app.use("/api/v1", projectRouter);
 
 const server = app.listen(process.env.PORT, () =>
   console.log(
