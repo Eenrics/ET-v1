@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import baseSchema from "./BaseSchema.js";
 import User from "./User.js";
+import Project from "./project.js";
 
 const taskSchema = new mongoose.Schema({
   ...baseSchema.obj,
