@@ -1,9 +1,9 @@
-import { ApolloServer } from ('@apollo/server')
-import { startStandaloneServer } from ('@apollo/server/standalone')
+import { ApolloServer } from '@apollo/server'
+import { startStandaloneServer } from '@apollo/server/standalone'
 import connectDatabase from "./config/database.js";
 import typeDefs from './schema/index.js'
 import resolvers from './resolvers/index.js'
-
+import dotenv from "dotenv";
 
 // database connnection
 dotenv.config({ path: "./config/config.env" });

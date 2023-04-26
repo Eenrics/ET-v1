@@ -1,4 +1,4 @@
-import { GraphQLError } from ('graphql') 
+import { GraphQLError } from 'graphql'
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import User from '../models/User.js'

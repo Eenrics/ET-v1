@@ -92,7 +92,19 @@ const typeDefs = `
     durationUnit: DurationUnit!
   }
 
+  input ExprienceInput {
+    title: String!
+    description: String!
+    durationValue: Int!
+    durationUnit: String!
+  }
+
   type BankAccount {
+    bankName: String!
+    accountNumber: String!
+  }
+
+  input BankAccountInput {
     bankName: String!
     accountNumber: String!
   }
@@ -104,13 +116,35 @@ const typeDefs = `
     salary: Salary
   }
 
+  input EmploymentifnoInput {
+    employmentStatus: String!
+    tinNumber: String!
+    jobType: String!
+    salary: SalaryInput!
+  }
+
   type Salary {
     amount: Int
     currency: String
     type: SalaryType
   }
 
+  input SalaryInput {
+    amount: Int!
+    currency: String!
+    type: String!
+  }
+
   type Address {
+    country: String
+    city: String
+    subCity: String
+    woreda: String
+    kebele: String
+    houseNumber: String
+  }
+
+  input AddressInput {
     country: String
     city: String
     subCity: String
@@ -126,15 +160,33 @@ const typeDefs = `
     completedAt: String!
   }
 
+  input EducationInput {
+    level: String!
+    name: String!
+    type: String!
+    completedAt: String!
+  }
+
   type Languages {
     language: Language!
     level: Level!
+  }
+
+  input LanguagesInput {
+    language: String!
+    level: String!
   }
 
   type LanguagePair {
     sourceLanguage: Language!
     targetLanguage: Language!
     level: Level!
+  }
+
+  input LanguagePairInput {
+    sourceLanguage: String!
+    targetLanguage: String!
+    level: String!
   }
 
   type BasicInfo {
@@ -148,7 +200,23 @@ const typeDefs = `
     profilePicture: String
   }
 
+  input BasicInfoInput {
+    gender: String!
+    emergencyContact: EmergencyContactInput
+    basicAssessmentExam: Boolean
+    bio: String
+    birthDate: String
+    cv: String
+    resume: String
+    profilePicture: String
+  }
+
   type EmergencyContact {
+    name: String
+    phoneNumber: String
+  }
+
+  input EmergencyContactInput {
     name: String
     phoneNumber: String
   }
@@ -169,6 +237,21 @@ const typeDefs = `
     userProfile: UserProfile
   }
 
+  input UserInput {
+    firstName: String!
+    fatherName: String!
+    grandFatherName: String
+    email: String!
+    password: String!
+    resetPasswordCode: String
+    resetPasswordCodeExpiration: String
+    phoneNumber: String
+    isEmailVerified: Boolean
+    verificationToken: String
+    verificationTokenExpiration: String
+    role: Int
+  }
+
   type UserProfile {
     user: User
     basicInfo: BasicInfo
@@ -179,6 +262,18 @@ const typeDefs = `
     bankAccount: BankAccount
     address: Address
     employmentifno: Employmentifno
+  }
+
+  input UserProfileInput {
+    user: UserInput
+    basicInfo: BasicInfoInput
+    exprience: [ExprienceInput!]
+    education: [EducationInput!]
+    languagePair: [LanguagePairInput!]
+    languages: [LanguagesInput!]
+    bankAccount: BankAccountInput
+    address: AddressInput
+    employmentifno: EmploymentifnoInput
   }
 
   type Base {
@@ -195,6 +290,11 @@ const typeDefs = `
     role: Role
   }
 
+  input TeamInput {
+    user: UserInput
+    role: String
+  }
+
   type Task {
     name: String
     description: String
@@ -205,6 +305,17 @@ const typeDefs = `
     documents: [String!]
     team: [Team]
     project: Project
+  }
+
+  input TaskInput {
+    name: String
+    description: String
+    startDate: String
+    deadLine: String
+    status: String
+    budget: Int
+    documents: [String!]
+    team: [TeamInput]
     projectId: String
   }
 
@@ -219,6 +330,18 @@ const typeDefs = `
     tasks: [Task!]
     projectManagers: [User!]
     payment: Payment
+  }
+
+  input ProjectInput {
+    name: String
+    description: String
+    startDate: String
+    deadLine: String
+    status: String
+    budget: Int
+    client: String
+    projectManagers: [UserInput!]
+    payment: String
   }
 
   type Payment {
@@ -258,11 +381,11 @@ const typeDefs = `
 
   type Query {
     getProfile: Profile!
-    fullProfile(userProfileData: UserProfile!): UserProfile!
+    fullProfile(userProfileData: UserProfileInput!): UserProfile!
     getProject(id: ID!): ProjectReturn
-    getAllProject(name: String!, status: Status!): ProjectsReturn
+    getAllProject(name: String!, status: String!): ProjectsReturn
     getTask(id: ID!): TaskReturn
-    getAllTask(name: String!, project: Project!): TasksReturn
+    getAllTask(name: String!, project: ProjectInput!): TasksReturn
   }
 
   type RegisterReturn {
@@ -289,9 +412,9 @@ const typeDefs = `
     logout: String!
     forgotPassword(email: String!): VerifyReturn!
     VerifyReturn(email: String!, code: String!, newPassword: String!): VerifyReturn!
-    setProfile(userData: Profile!): User!
-    createProject(newProject: Project!): ProjectReturn!
-    createTask(newTask: Task!): TaskReturn!
+    setProfile(userData: UserInput!): User!
+    createProject(newProject: ProjectInput!): ProjectReturn!
+    createTask(newTask: TaskInput!): TaskReturn!
   }
 
 `
