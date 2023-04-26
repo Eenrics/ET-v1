@@ -8,11 +8,107 @@ import checkRole from '../utils/checkRole.js'
 import Project from '../models/Project.js'
 
 const resolvers = {
-    Query: {},
+    Query: {
+      get_profile: async (root, args, {currUser, token}) => {
+          
+        if (!currUser) {
+          throw new GraphQLError('not authenticated', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              message: "Unauthorized: Invalid token"
+            }
+          })
+        }
+
+        return {
+            success: true,
+            data: {
+              email: currUser.email,
+              phoneNumber: currUser.phoneNumber,
+              userProfile: currUser.userProfile,
+            }
+          };
+
+      },
+      full_profile: async (root, args, {currUser, token}) => {
+          
+        if (!currUser) {
+          throw new GraphQLError('not authenticated', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              message: "Unauthorized: Invalid token"
+            }
+          })
+        }
+
+        const { userProfileData } = args;
+        const userId = currUser._id;
+
+        try {
+          // Find the userProfile for the user and update it
+          const updatedUserProfile = await UserProfile.findOneAndUpdate(
+            { user: userId },
+            { $set: userProfileData },
+
+            {
+              new: true,
+              upsert: true,
+              runValidators: true,
+            }
+          ).populate("user");
+
+          return { userProfile: updatedUserProfile };
+          
+        } catch (error) {
+          console.error(error);
+          throw new GraphQLError('Profile set failed', {
+            extensions: {
+              code: 'server error',
+              error
+            }
+          })
+        }
+      },
+      get_project: async (root, args, {currUser, token}) => {
+
+        if (!currUser) {
+          throw new GraphQLError('not authenticated', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              message: "Unauthorized: Invalid token"
+            }
+          })
+        }
+
+        if (!checkRole([0, 1], currUser.role)) {
+          throw new GraphQLError('not authorized', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              message: "Unauthorized: Invalid role"
+            }
+          })
+        }
+
+        const { id } = args;
+
+        try {
+          const project = await Project.findById(id).populate("tasks");
+
+          if (!project) {
+            throw Error("there is no project with this id");
+          }
+
+          res.status(200).json({ success: true, project });
+        } catch (error) {
+          res.status(404).json({ success: false, message: error.message });
+        }
+        
+      }
+    },
     Mutation: {
-        register: async (root, args, {currUser, body}) => {
+        register: async (root, args, {currUser, token}) => {
             
-              const { email, password, phoneNumber } = body;
+              const { email, password, phoneNumber } = args;
 
               try {
                 const user = await User.register(email, password, phoneNumber);
@@ -64,7 +160,7 @@ const resolvers = {
                 })
               }
         },
-        verify_email: async (root, args, {token, body}) => {
+        verify_email: async (root, args, {token, currUser}) => {
 
           try {
             // Find user with matching verification token
@@ -103,8 +199,8 @@ const resolvers = {
           }
 
         },
-        login: async (root, args, {token, body}) => { 
-          const { identifier, password } = body;
+        login: async (root, args, {token, currUser}) => { 
+          const { identifier, password } = args;
 
           try {
             const user = await User.login(identifier, password);
@@ -132,7 +228,7 @@ const resolvers = {
               })
           }
         },
-        logout: async (root, args, {currUser, token, body}) => { 
+        logout: async (root, args, {currUser, token}) => { 
 
           if (!currUser) {
             throw new GraphQLError('not authenticated', {
@@ -146,8 +242,8 @@ const resolvers = {
           // I think log out should be enough on the front
 
         },
-        forgot_passwordasync: async (root, args, {currUser, token, body}) => { 
-          const { email } = body;
+        forgot_password: async (root, args, {currUser, token}) => { 
+          const { email } = args;
 
           try {
             const code = await User.forgotPassword(email);
@@ -184,8 +280,8 @@ const resolvers = {
           };
 
         },
-        reset_password: async (root, args, {currUser, token, body}) => { 
-          const { email, code, newPassword } = body;
+        reset_password: async (root, args, {currUser, token}) => { 
+          const { email, code, newPassword } = args;
 
           try {
             const user = await User.findOne({ email });
@@ -216,28 +312,7 @@ const resolvers = {
             };
 
         },
-        get_profile: async (root, args, {currUser, token, body}) => {
-          
-          if (!currUser) {
-            throw new GraphQLError('not authenticated', {
-              extensions: {
-                code: 'BAD_USER_INPUT',
-                message: "Unauthorized: Invalid token"
-              }
-            })
-          }
-
-          return {
-              success: true,
-              data: {
-                email: currUser.email,
-                phoneNumber: currUser.phoneNumber,
-                userProfile: currUser.userProfile,
-              }
-            };
-
-        },
-        set_profile: async (root, args, {currUser, token, body}) => {
+        set_profile: async (root, args, {currUser, token}) => {
 
           if (!currUser) {
             throw new GraphQLError('not authenticated', {
@@ -248,7 +323,7 @@ const resolvers = {
             })
           }
 
-          const { userData } = body;
+          const { userData } = args;
           const userId = currUser._id;
 
           try {
@@ -270,46 +345,7 @@ const resolvers = {
             })
           }
         },
-        full_profile: async (root, args, {currUser, token, body}) => {
-          
-          if (!currUser) {
-            throw new GraphQLError('not authenticated', {
-              extensions: {
-                code: 'BAD_USER_INPUT',
-                message: "Unauthorized: Invalid token"
-              }
-            })
-          }
-
-          const { userProfileData } = body;
-          const userId = currUser._id;
-
-          try {
-            // Find the userProfile for the user and update it
-            const updatedUserProfile = await UserProfile.findOneAndUpdate(
-              { user: userId },
-              { $set: userProfileData },
-
-              {
-                new: true,
-                upsert: true,
-                runValidators: true,
-              }
-            ).populate("user");
-
-            return { userProfile: updatedUserProfile };
-            
-          } catch (error) {
-            console.error(error);
-            throw new GraphQLError('Profile set failed', {
-              extensions: {
-                code: 'server error',
-                error
-              }
-            })
-          }
-        },
-        create_project: async (root, args, {currUser, token, body}) => {
+        create_project: async (root, args, {currUser, token}) => {
 
           if (!currUser) {
             throw new GraphQLError('not authenticated', {
@@ -340,7 +376,7 @@ const resolvers = {
               client,
               projectManagers,
               payment,
-            } = body;
+            } = args;
         
             const project = new Project({
               name,
@@ -368,41 +404,7 @@ const resolvers = {
           }
 
         },
-        get_project: async (root, args, {currUser, token, body}) => {
-
-          if (!currUser) {
-            throw new GraphQLError('not authenticated', {
-              extensions: {
-                code: 'BAD_USER_INPUT',
-                message: "Unauthorized: Invalid token"
-              }
-            })
-          }
-
-          if (!checkRole([0, 1], currUser.role)) {
-            throw new GraphQLError('not authorized', {
-              extensions: {
-                code: 'BAD_USER_INPUT',
-                message: "Unauthorized: Invalid role"
-              }
-            })
-          }
-
-          const { id } = args;
-
-          try {
-            const project = await Project.findById(id).populate("tasks");
-
-            if (!project) {
-              throw Error("there is no project with this id");
-            }
-
-            res.status(200).json({ success: true, project });
-          } catch (error) {
-            res.status(404).json({ success: false, message: error.message });
-          }
-          
-        }
+        
     }
 }
 

@@ -21,7 +21,6 @@ startStandaloneServer(server, {
     context: async ({ req, res }) => {
         // I am not sure if you are looking for authorization header part to verify user.. I assumed you do
       const auth = req ? req.headers.authorization : null
-      const body = req.body
       const token = req.query.token
       if (auth) {
         const decToken = jwt.verify(
@@ -29,7 +28,7 @@ startStandaloneServer(server, {
           )
           // when you created token, you used users _id.. 
           const currUser = await User.findById(decToken._id).populate("userProfile")
-        return { currUser, body, token }
+        return { currUser, token }
       }
     },
   }).then(({ url }) => {
