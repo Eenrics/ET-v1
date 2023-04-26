@@ -4,7 +4,7 @@ import exprienceSchema from "./subUserSchema/exprience.js";
 import educationSchema from "./subUserSchema/education.js";
 import languagePairSchema from "./subUserSchema/languagepair.js";
 import languagesSchema from "./subUserSchema/languages.js";
-import bankAccountSchema from "./subUserSchema/bankAccount.js";
+import bankAccountSchema from "./subUserSchema/bankaccount.js";
 import basicInfoSchema from "./subUserSchema/basicInfo.js";
 import AddressSchema from "./subUserSchema/AddresSchema.js";
 import employmentifnoSchema from "./subUserSchema/employmentifno.js";

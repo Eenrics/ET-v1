@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv"
 
+dotenv.config()
 // this will connect the database and let us login
 mongoose.set("strictQuery", false);
 const connectDatabase = () => {

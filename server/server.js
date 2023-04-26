@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import authRouter from "./routes/authRoute.js";
 import userRouter from "./routes/profileRoute.js";
-import projectRouter from "./routes/projectRoute.js";
+import projectRouter from "./routes/Projectroute.js";
 
 // database connnection
 import connectDatabase from "./config/database.js";

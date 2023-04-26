@@ -1,4 +1,4 @@
-import Project from "../../models/project.js";
+import Project from "../../models/Project.js";
 
 // get project by id and preload the tasks
 const getProject = async (req, res) => {
