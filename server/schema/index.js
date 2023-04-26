@@ -1,4 +1,5 @@
 const typeDefs = `
+
   enum DurationUnit {
     months
     years
@@ -227,3 +228,5 @@ const typeDefs = `
   }
 
 `
+
+export default typeDefs
