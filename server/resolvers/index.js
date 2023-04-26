@@ -95,15 +95,83 @@ const resolvers = {
           const project = await Project.findById(id).populate("tasks");
 
           if (!project) {
-            throw Error("there is no project with this id");
+            throw new GraphQLError('Request failed', {
+              extensions: {
+                code: 'project not found',
+              }
+            })
           }
 
-          res.status(200).json({ success: true, project });
+          return { success: true, project };
         } catch (error) {
-          res.status(404).json({ success: false, message: error.message });
+          throw new GraphQLError('Request failed', {
+            extensions: {
+              code: 'server error',
+            }
+          })
         }
         
-      }
+      },
+      get_all_project: async (root, args, {currUser, token}) => {
+
+        if (!currUser) {
+          throw new GraphQLError('not authenticated', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              message: "Unauthorized: Invalid token"
+            }
+          })
+        }
+
+        if (!checkRole([0, 1], currUser.role)) {
+          throw new GraphQLError('not authorized', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              message: "Unauthorized: Invalid role"
+            }
+          })
+        }
+
+        const { name, status } = args;
+
+        try {
+      
+          let filters = {};
+      
+          if (name) {
+            filters.name = new RegExp(name, "i"); // Use regex for case-insensitive search
+          }
+          if (status) {
+            filters.status = status;
+          }
+      
+          const projects = await Project.find(filters).populate("tasks", "name");
+          if (!projects) {
+            throw new GraphQLError('Request failed', {
+              extensions: {
+                code: 'projects not found',
+              }
+            })
+          }
+      
+          if (!projects.length) {
+            throw new GraphQLError('Request failed', {
+              extensions: {
+                code: 'projects not found with a given filter',
+              }
+            })
+          }
+      
+          return { success: true, projects };
+        } catch (error) {
+          throw new GraphQLError('Request failed', {
+            extensions: {
+              code: 'server error',
+            }
+          })
+        }
+        
+      },
     },
     Mutation: {
         register: async (root, args, {currUser, token}) => {
