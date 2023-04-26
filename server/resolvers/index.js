@@ -537,19 +537,19 @@ const resolvers = {
             })
           }
 
+          const {
+            name,
+            description,
+            startDate,
+            deadLine,
+            status,
+            budget,
+            client,
+            projectManagers,
+            payment,
+          } = args.newProject;
+
           try {
-            const {
-              name,
-              description,
-              startDate,
-              deadLine,
-              status,
-              budget,
-              client,
-              projectManagers,
-              payment,
-            } = args;
-        
             const project = new Project({
               name,
               description,
@@ -596,19 +596,19 @@ const resolvers = {
             })
           }
 
+          const {
+            name,
+            description,
+            startDate,
+            deadLine,
+            status,
+            budget,
+            documents,
+            team,
+            projectId,
+          } = args.newTask;
+
           try {
-            const {
-              name,
-              description,
-              startDate,
-              deadLine,
-              status,
-              budget,
-              documents,
-              team,
-              projectId,
-            } = args;
-        
             // Check if the project exists
             const project = await Project.findById(projectId);
             if (!project) {

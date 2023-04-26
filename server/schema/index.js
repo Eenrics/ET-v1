@@ -205,6 +205,7 @@ const typeDefs = `
     documents: [String!]
     team: [Team]
     project: Project
+    projectId: String
   }
 
   type Project {
@@ -288,6 +289,9 @@ const typeDefs = `
     logout: String!
     forgotPassword(email: String!): VerifyReturn!
     VerifyReturn(email: String!, code: String!, newPassword: String!): VerifyReturn!
+    setProfile(userData: Profile!): User!
+    createProject(newProject: Project!): ProjectReturn!
+    createTask(newTask: Task!): TaskReturn!
   }
 
 `
