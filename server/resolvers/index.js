@@ -10,7 +10,7 @@ import Task from '../models/Task.js'
 
 const resolvers = {
     Query: {
-      get_profile: async (root, args, {currUser, token}) => {
+      getProfile: async (root, args, {currUser, token}) => {
           
         if (!currUser) {
           throw new GraphQLError('not authenticated', {
@@ -23,15 +23,13 @@ const resolvers = {
 
         return {
             success: true,
-            data: {
-              email: currUser.email,
-              phoneNumber: currUser.phoneNumber,
-              userProfile: currUser.userProfile,
-            }
+            email: currUser.email,
+            phoneNumber: currUser.phoneNumber,
+            userProfile: currUser.userProfile,
           };
 
       },
-      full_profile: async (root, args, {currUser, token}) => {
+      fullProfile: async (root, args, {currUser, token}) => {
           
         if (!currUser) {
           throw new GraphQLError('not authenticated', {
@@ -70,7 +68,7 @@ const resolvers = {
           })
         }
       },
-      get_project: async (root, args, {currUser, token}) => {
+      getProject: async (root, args, {currUser, token}) => {
 
         if (!currUser) {
           throw new GraphQLError('not authenticated', {
@@ -113,7 +111,7 @@ const resolvers = {
         }
         
       },
-      get_all_project: async (root, args, {currUser, token}) => {
+      getAllProject: async (root, args, {currUser, token}) => {
 
         if (!currUser) {
           throw new GraphQLError('not authenticated', {
@@ -174,7 +172,7 @@ const resolvers = {
         }
         
       },
-      get_task: async (root, args, {currUser, token}) => {
+      getTask: async (root, args, {currUser, token}) => {
 
         if (!currUser) {
           throw new GraphQLError('not authenticated', {
@@ -217,7 +215,7 @@ const resolvers = {
           })
         }
       },
-      get_all_task: async (root, args, {currUser, token}) => {
+      getAllTask: async (root, args, {currUser, token}) => {
 
         if (!currUser) {
           throw new GraphQLError('not authenticated', {
@@ -267,7 +265,7 @@ const resolvers = {
             })
           }
       
-          return { success: true, number: count, tasks };
+          return { success: true, count, tasks };
         } catch (error) {
           throw new GraphQLError('Request failed', {
             extensions: {
@@ -333,7 +331,7 @@ const resolvers = {
                 })
               }
         },
-        verify_email: async (root, args, {token, currUser}) => {
+        verifyEmail: async (root, args, {token, currUser}) => {
 
           try {
             // Find user with matching verification token
@@ -413,9 +411,10 @@ const resolvers = {
           }
 
           // I think log out should be enough on the front
+          return "Logged out"
 
         },
-        forgot_password: async (root, args, {currUser, token}) => { 
+        forgotPassword: async (root, args, {currUser, token}) => { 
           const { email } = args;
 
           try {
@@ -453,7 +452,7 @@ const resolvers = {
           };
 
         },
-        reset_password: async (root, args, {currUser, token}) => { 
+        VerifyReturn: async (root, args, {currUser, token}) => { 
           const { email, code, newPassword } = args;
 
           try {
@@ -485,7 +484,7 @@ const resolvers = {
             };
 
         },
-        set_profile: async (root, args, {currUser, token}) => {
+        setProfile: async (root, args, {currUser, token}) => {
 
           if (!currUser) {
             throw new GraphQLError('not authenticated', {
@@ -518,7 +517,7 @@ const resolvers = {
             })
           }
         },
-        create_project: async (root, args, {currUser, token}) => {
+        createProject: async (root, args, {currUser, token}) => {
 
           if (!currUser) {
             throw new GraphQLError('not authenticated', {
@@ -577,7 +576,7 @@ const resolvers = {
           }
 
         },
-        create_task: async (root, args, {currUser, token}) => {
+        createTask: async (root, args, {currUser, token}) => {
 
           if (!currUser) {
             throw new GraphQLError('not authenticated', {

@@ -227,6 +227,69 @@ const typeDefs = `
     paymentMethod: PaymentMethod
   }
 
+  type Profile {
+    success: Boolean!
+    email: String
+    phoneNumber: String
+    userProfile: UserProfile
+  }
+
+  type ProjectReturn {
+    success: Boolean!
+    project: Project
+  }
+
+  type ProjectsReturn {
+    success: Boolean!
+    projects: [Project!]
+  }
+
+  type TaskReturn {
+    success: Boolean!
+    task: Task
+  }
+
+  type TasksReturn {
+    success: Boolean!
+    count: Int!
+    tasks: [Task!]
+  }
+
+  type Query {
+    getProfile: Profile!
+    fullProfile(userProfileData: UserProfile!): UserProfile!
+    getProject(id: ID!): ProjectReturn
+    getAllProject(name: String!, status: Status!): ProjectsReturn
+    getTask(id: ID!): TaskReturn
+    getAllTask(name: String!, project: Project!): TasksReturn
+  }
+
+  type RegisterReturn {
+    success: Boolean!
+    user: User
+    message: String!
+  }
+
+  type VerifyReturn {
+    success: Boolean!
+    message: String!
+  }
+
+  type TokenReturn {
+    success: Boolean!
+    message: String!
+    token: String!
+  }
+
+  type Mutation {
+    register(email: String!, password: String!, phoneNumber: String!): RegisterReturn!
+    verifyEmail: VerifyReturn!
+    login(identifier: String!, password: String!): TokenReturn!
+    logout: String!
+    forgotPassword(email: String!): VerifyReturn!
+    VerifyReturn(email: String!, code: String!, newPassword: String!): VerifyReturn!
+  }
+
 `
 
 export default typeDefs
