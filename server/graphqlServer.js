@@ -28,7 +28,7 @@ startStandaloneServer(server, {
           auth.substring(7), process.env.JWT_SECRET
           )
           // when you created token, you used users _id.. 
-          const currUser = await User.findById(decToken._id)
+          const currUser = await User.findById(decToken._id).populate("userProfile")
         return { currUser, body, token }
       }
     },

@@ -1,11 +1,10 @@
 import { GraphQLError } from ('graphql') 
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
-import authRouter from "./routes/authRoute.js";
-import userRouter from "./routes/profileRoute.js";
-import projectRouter from "./routes/Projectroute.js";
 import User from '../models/User.js'
 import createToken from '../utils/CreateToken.js'
+import UserProfile from '../models/UserProfile.js'
+import checkRole from '../utils/checkRole.js'
 
 const resolvers = {
     Query: {},
@@ -214,6 +213,112 @@ const resolvers = {
             success: true, 
             message: "Password reset successful" 
             };
+
+        },
+        get_profile: async (root, args, {currUser, token, body}) => {
+          
+          if (!currUser) {
+            throw new GraphQLError('not authenticated', {
+              extensions: {
+                code: 'BAD_USER_INPUT',
+                message: "Unauthorized: Invalid token"
+              }
+            })
+          }
+
+          return {
+              success: true,
+              data: {
+                email: currUser.email,
+                phoneNumber: currUser.phoneNumber,
+                userProfile: currUser.userProfile,
+              }
+            };
+
+        },
+        set_profile: async (root, args, {currUser, token, body}) => {
+
+          if (!currUser) {
+            throw new GraphQLError('not authenticated', {
+              extensions: {
+                code: 'BAD_USER_INPUT',
+                message: "Unauthorized: Invalid token"
+              }
+            })
+          }
+
+          const { userData } = body;
+          const userId = currUser._id;
+
+          try {
+            // Find the user by ID and update their user data
+            const updatedUser = await User.findByIdAndUpdate(userId, userData, {
+              new: true,
+              runValidators: true,
+            });
+
+          return { user: updatedUser };
+
+          } catch (error) {
+            console.error(error);
+            throw new GraphQLError('Profile set failed', {
+              extensions: {
+                code: 'server error',
+                error
+              }
+            })
+          }
+        },
+        full_profile: async (root, args, {currUser, token, body}) => {
+          
+          if (!currUser) {
+            throw new GraphQLError('not authenticated', {
+              extensions: {
+                code: 'BAD_USER_INPUT',
+                message: "Unauthorized: Invalid token"
+              }
+            })
+          }
+
+          const { userProfileData } = body;
+          const userId = currUser._id;
+
+          try {
+            // Find the userProfile for the user and update it
+            const updatedUserProfile = await UserProfile.findOneAndUpdate(
+              { user: userId },
+              { $set: userProfileData },
+
+              {
+                new: true,
+                upsert: true,
+                runValidators: true,
+              }
+            ).populate("user");
+
+            return { userProfile: updatedUserProfile };
+            
+          } catch (error) {
+            console.error(error);
+            throw new GraphQLError('Profile set failed', {
+              extensions: {
+                code: 'server error',
+                error
+              }
+            })
+          }
+        },
+        create_project: async (root, args, {currUser, token, body}) => {
+
+          if (!currUser) {
+            throw new GraphQLError('not authenticated', {
+              extensions: {
+                code: 'BAD_USER_INPUT',
+                message: "Unauthorized: Invalid token"
+              }
+            })
+          }
+
 
         }
     }
