@@ -6,6 +6,7 @@ import createToken from '../utils/CreateToken.js'
 import UserProfile from '../models/UserProfile.js'
 import checkRole from '../utils/checkRole.js'
 import Project from '../models/Project.js'
+import Task from '../models/Task.js'
 
 const resolvers = {
     Query: {
@@ -167,10 +168,114 @@ const resolvers = {
           throw new GraphQLError('Request failed', {
             extensions: {
               code: 'server error',
+              error
             }
           })
         }
         
+      },
+      get_task: async (root, args, {currUser, token}) => {
+
+        if (!currUser) {
+          throw new GraphQLError('not authenticated', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              message: "Unauthorized: Invalid token"
+            }
+          })
+        }
+
+        if (!checkRole([0, 1], currUser.role)) {
+          throw new GraphQLError('not authorized', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              message: "Unauthorized: Invalid role"
+            }
+          })
+        }
+
+        const { id } = args;
+
+        try {
+          const task = await Task.findById(id).populate("project", "name");
+
+          if (!task) {
+            throw new GraphQLError('Request failed', {
+              extensions: {
+                code: 'task not found',
+              }
+            })
+          }
+
+          return { success: true, task };
+        } catch (error) {
+          throw new GraphQLError('Request failed', {
+            extensions: {
+              code: 'server error',
+              error
+            }
+          })
+        }
+      },
+      get_all_task: async (root, args, {currUser, token}) => {
+
+        if (!currUser) {
+          throw new GraphQLError('not authenticated', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              message: "Unauthorized: Invalid token"
+            }
+          })
+        }
+
+        if (!checkRole([0, 1], currUser.role)) {
+          throw new GraphQLError('not authorized', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              message: "Unauthorized: Invalid role"
+            }
+          })
+        }
+
+        const { name, project } = args;
+
+        try {
+          let filters = {};
+      
+          if (name) {
+            filters.name = new RegExp(name, "i");
+          }
+          if (project) {
+            filters.project = project;
+          }
+      
+          const tasks = await Task.find(filters).populate("project", "name");
+          let count = tasks.length;
+      
+          if (!tasks) {
+             throw new GraphQLError('Request failed', {
+              extensions: {
+                code: 'tasks not found',
+              }
+            })
+          }
+          if (!tasks.length) {
+            throw new GraphQLError('Request failed', {
+              extensions: {
+                code: 'tasks not found with given filter',
+              }
+            })
+          }
+      
+          return { success: true, number: count, tasks };
+        } catch (error) {
+          throw new GraphQLError('Request failed', {
+            extensions: {
+              code: 'server error',
+              error
+            }
+          })
+        }
       },
     },
     Mutation: {
@@ -472,7 +577,80 @@ const resolvers = {
           }
 
         },
+        create_task: async (root, args, {currUser, token}) => {
+
+          if (!currUser) {
+            throw new GraphQLError('not authenticated', {
+              extensions: {
+                code: 'BAD_USER_INPUT',
+                message: "Unauthorized: Invalid token"
+              }
+            })
+          }
+
+          if (!checkRole([0, 1], currUser.role)) {
+            throw new GraphQLError('not authorized', {
+              extensions: {
+                code: 'BAD_USER_INPUT',
+                message: "Unauthorized: Invalid role"
+              }
+            })
+          }
+
+          try {
+            const {
+              name,
+              description,
+              startDate,
+              deadLine,
+              status,
+              budget,
+              documents,
+              team,
+              projectId,
+            } = args;
         
+            // Check if the project exists
+            const project = await Project.findById(projectId);
+            if (!project) {
+              throw new GraphQLError('Request failed', {
+                extensions: {
+                  code: 'project not found',
+                }
+              })
+            }
+        
+            // Create a new task
+            const task = new Task({
+              name,
+              description,
+              startDate,
+              deadLine,
+              status,
+              budget,
+              documents,
+              team,
+              project: projectId,
+            });
+        
+            // Save the new task to the database
+            await task.save();
+        
+            // Push the new task ID to the project.tasks array
+            await Project.findByIdAndUpdate(projectId, { $push: { tasks: task._id } });
+        
+            // Send a response with the new task data
+            return { success: true, task };
+          } catch (error) {
+            console.error(error);
+            throw new GraphQLError('Project creation failed', {
+              extensions: {
+                code: 'server error',
+                error
+              }
+            })
+          }
+        }       
     }
 }
 
