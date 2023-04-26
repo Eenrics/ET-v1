@@ -5,6 +5,7 @@ import User from '../models/User.js'
 import createToken from '../utils/CreateToken.js'
 import UserProfile from '../models/UserProfile.js'
 import checkRole from '../utils/checkRole.js'
+import Project from '../models/Project.js'
 
 const resolvers = {
     Query: {},
@@ -319,7 +320,88 @@ const resolvers = {
             })
           }
 
+          if (!checkRole([0, 1], currUser.role)) {
+            throw new GraphQLError('not authorized', {
+              extensions: {
+                code: 'BAD_USER_INPUT',
+                message: "Unauthorized: Invalid role"
+              }
+            })
+          }
 
+          try {
+            const {
+              name,
+              description,
+              startDate,
+              deadLine,
+              status,
+              budget,
+              client,
+              projectManagers,
+              payment,
+            } = body;
+        
+            const project = new Project({
+              name,
+              description,
+              startDate,
+              deadLine,
+              status,
+              budget,
+              client,
+              projectManagers,
+              payment,
+            });
+        
+            await project.save();
+        
+            return { success: true, project };
+          } catch (err) {
+            console.error(err);
+            throw new GraphQLError('Project creation failed', {
+              extensions: {
+                code: 'server error',
+                err
+              }
+            })
+          }
+
+        },
+        get_project: async (root, args, {currUser, token, body}) => {
+
+          if (!currUser) {
+            throw new GraphQLError('not authenticated', {
+              extensions: {
+                code: 'BAD_USER_INPUT',
+                message: "Unauthorized: Invalid token"
+              }
+            })
+          }
+
+          if (!checkRole([0, 1], currUser.role)) {
+            throw new GraphQLError('not authorized', {
+              extensions: {
+                code: 'BAD_USER_INPUT',
+                message: "Unauthorized: Invalid role"
+              }
+            })
+          }
+
+          const { id } = args;
+
+          try {
+            const project = await Project.findById(id).populate("tasks");
+
+            if (!project) {
+              throw Error("there is no project with this id");
+            }
+
+            res.status(200).json({ success: true, project });
+          } catch (error) {
+            res.status(404).json({ success: false, message: error.message });
+          }
+          
         }
     }
 }
